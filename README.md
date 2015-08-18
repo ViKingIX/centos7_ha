@@ -37,6 +37,10 @@ all# `echo $PASSWD | passwd --stdin hacluster`
 any# `pcs cluster auth -u hacluster -p $PASSWD router-01 router-02`
 #### setup cluster
 any# `pcs cluster setup --name router router-01 router-02`
+#### disable stonith
+any# `pcs property set stonith-enabled=false`
+#### disable quorum
+any# `pcs property set no-quorum-policy=ignore`
 
 
 ### Verify cluster
@@ -48,10 +52,10 @@ any# `pcs cluster status`
 
 ### Add resources
 #### Add vip for uplink
-any# `pcs resource create vip_up ip=$IP_up cidr_netmask=24 nic=$NIC_up`
+any# `pcs resource create vip_up ocf:heartbeat:IPaddr2 ip=$IP_up cidr_netmask=24 nic=$NIC_up`
 
 #### Add vip for downlink
-any# `pcs resource create vip_down ip=$IP_down cidr_netmask=24 nic=$NIC_down`
+any# `pcs resource create vip_down ocf:heartbeat:IPaddr2 ip=$IP_down cidr_netmask=24 nic=$NIC_down`
 
 #### Group the vips (to make the resources run on the same machine)
 any# `pcs resource group add grp_vip vip_up vip_down`
